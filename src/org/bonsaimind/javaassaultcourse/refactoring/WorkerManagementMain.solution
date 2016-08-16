@@ -1,0 +1,144 @@
+Worker Management
+=================
+
+
+What it does
+------------
+
+This program simply enlists some workers, assigns them their current duties
+and keeps track if the worker does have tools to work with.
+
+It then prints a list of all workers and checks if one of them is actually
+working.
+
+
+Problems
+--------
+
+There are multiple problems with how this program is written, even though
+it does work:
+
+ 1. Correlating data is kept in three separate `String` arrays
+    (`workerHasTools`, `workerJobs`, `workerNames`).
+ 2. The arrays have an arbitrary size to `22`.
+ 3. How many workers there are is recorded in an extranous variable,
+    `workerCount`.
+ 4. `workerCount` is a `byte`.
+ 5. The data is filled in a very delicate way.
+ 6. Assigning the jobs performs nine set operations, even though there are only
+    6 workers.
+ 7. Assigning the jobs could be done in a loop.
+ 8. The jobs are magic string values.
+ 9. `workerHasTools` is a `string` even though it could be `boolean`.
+ 10. The code assumes that certain workers are at certain positions in the data.
+ 11. The check if Soren is working is broken.
+ 12. The check if Soren is working should check against `"Idle"` instead of
+     everything else.
+
+
+Subtle String bug
+-----------------
+
+The check if Soren is actually workign is broken:
+
+    if (workerJobs[4] != "Assembling" && workerJobs[4] != "Polishing" && workerJobs[4] != "Cleaning") {
+
+`!=` and `==` check for object *identity*, not equality. Strings, even though
+having the same value, are not guaranteed to be the same object/instance. In
+this case it plays out because all strings are known at compile time and are
+interned by default.
+
+Strings should always be checked by using `equals`.
+
+
+The refactoring
+---------------
+
+This program can be refactored in the following steps:
+
+ 1. The check if Soren is working is fixed by replacing it with a check against
+    `"Idle"`.
+ 2. Assigning random tasks is changed to a proper `for` loop and does assign
+    every worker a task.
+ 3. `workerHasTools` is changed to `boolean`.
+ 4. The arrays are replaced with lists, which will allow to get rid of
+    `workerCount`.
+ 5. A new class called `Worker` is created which holds the fields `name`, `job`
+    and `hasTools`. The three lists are replaced with one map holding instances
+    of the new `Worker` class, indexed by the worker name.
+ 6. An enum is introduced to represent the jobs.
+ 7. An additional function to add workers can be added to omit duplication.
+
+This will leave us with the following code (getters/setters  and documentation
+is omitted for brevity reasons):
+
+    public class WorkerManagementMain {
+        private Map<String, Worker> workers = new HashMap<>();
+        
+        public static void main(String[] args) {
+            new WorkerManagementMain();
+        }
+        
+        public WorkerManagementMain() {
+            addWorker("Thomas", true);
+            addWorker("Matthew", true);
+            addWorker("Marianna", false);
+            addWorker("Andrea", true);
+            addWorker("Soren", false);
+            addWorker("Lucia", true);
+            
+            Random random = new Random();
+            for (Worker worker : workers.values()) {
+                int randomIndex = random.nextInt(Job.values().length);
+                Job randomJob = Job.values()[randomIndex];
+                
+                worker.job = randomJob;
+            }
+            
+            if (workers.containsKey("Marianna")) {
+                Worker worker = workers.remove("Marianna");
+                worker.name = "Susan";
+                workers.put("Susan", worker);
+            }
+            
+            // Print what everyone is doing.
+            for (Worker worker : workers.values()) {
+                System.out.println(worker);
+            }
+            
+            // Let's check if Soren is working at all!
+            if (workers.containsKey("Soren")) {
+                Worker soren = workers.get("Soren");
+                
+                if (soren.job == Job.IDLE) {
+                    System.out.println();
+                    System.out.println("Soren isn't working!");
+                }
+            }
+        }
+        
+        private void addWorker(String name, boolean hasTools) {
+            workers.put(name, new Worker(name, Job.IDLE, hasTools));
+        }
+        
+        private enum Job {
+            ASSEMBLIUNG, CLEANING, IDLE, POLISHING;
+        }
+        
+        private static final class Worker {
+            private String name;
+            private Job job;
+            private boolean hasTools;
+            
+            public Worker(String name, Job job, boolean hasTools) {
+                this.name = name;
+                this.job = job;
+                this.hasTools = hasTools;
+            }
+            
+            @Override
+            public void toString() {
+                return name + ": " + job + " | Has tools: " + Boolean.toString(hasTools);
+            }
+        }
+    }

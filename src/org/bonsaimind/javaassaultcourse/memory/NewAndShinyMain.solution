@@ -1,0 +1,69 @@
+New And Shiny
+=============
+
+
+What it does
+------------
+
+This program does iterate over all numbers up to 100,000, turns them into
+a string and concatenates these strings together. It outputs the length of
+the string and the time it took. 
+
+
+Problems
+--------
+
+The problem here is that concatenating strings is an expensive operation.
+Because strings are immutable, eveyr concatenation must create a new object,
+let's assume the following code:
+
+    String c = a + b;
+
+Which results roughly in the following operations:
+
+ 1. A new `String`, `c`, with the size of `a` and `b` is created.
+ 2. The content of `a` is copied into `c`.
+ 3. The content of `c` is copied into `c`.
+
+That means that for a short amount of time memory in the size of `(a + b) * 2`
+is required for the operation.
+
+
+StringBuilder
+-------------
+
+The answer is to use something which does not create unnecessary memory and
+garbage, and the answer is `StringBuilder`. It allows to "dynamically" create
+a string without constantly creating new strings.
+
+
+The refactoring
+---------------
+
+This program is easily refactored by replacing the string `numbers` with
+a `StringBuilder`.
+
+    StringBuilder numbers = new StringBuilder();
+    
+    for (int counter = 0; counter < 100_000; counter++) {
+        numbers.append(counter);
+    }
+    
+    System.out.println(numbers.length());
+
+We see that it runs in a fraction of the original runtime. That is because the
+new strings are appended to an already existing buffer instead of constantly
+creating new strings.
+
+The next step would be to strip out the concatenation part at all, as we can
+do the same with simply counting the length.
+
+    int length = 0;
+    
+    for (int counter = 0; counter < 100_000; counter++) {
+        length = length + Integer.toString(counter).length();
+    }
+    
+    System.out.println(length);
+
+And again it does run a lot faster.

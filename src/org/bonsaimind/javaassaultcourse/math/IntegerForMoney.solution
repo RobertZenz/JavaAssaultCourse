@@ -1,0 +1,56 @@
+New And Shiny
+=============
+
+
+What it does
+------------
+
+This program does sum up prices of items. It uses an `int` to store the value
+to make sure that there are no problems with floating point inaccuracies.
+
+
+Problems
+--------
+
+The problem here is that precision is lost every time the value is divided
+by another number. By default dividing an integer by an integer will yield
+an integer, like this:
+
+    int result = 10 / 3;
+    // result == 3 
+
+Additionally the `+=` operator is not shorthand for `a = a + b` but is actually
+shorthand for `a = ((T)a + b)`, with `T` being the target type. So this
+expression compiles just fine:
+
+    int result = 0.5d / 0.2d;
+    // result == 0
+    
+With that in mind we can identify three lines as problematic:
+
+    30: valueInCents += (41_90 * 0.75); // New shoes (discount of 25%)
+    
+    34: valueInCents += (valueInCents * TAX_RATE_IN_PERCENT / 100);
+    
+    38: System.out.println(valueInCents / 100);
+
+On line 30 we're losing precision because the result of the calculation is
+`3142.45` which is casted to `int`.
+
+On line 34 the division is done only using `int`s, the same on line 38.
+
+Fixing that
+-----------
+
+The easiest fix would be to correctly round and qualify the numbers:
+
+    30: valueInCents += Math.round(41_90 * 0.75); // New shoes (discount of 25%)
+    
+    34: valueInCents += Math.round(valueInCents * TAX_RATE_IN_PERCENT / 100d);
+    
+    38: System.out.println(valueInCents / 100d);
+
+Note that the numbers are now doubles where appropriate.
+
+Another possibility is to use a `BigDecimal` and represent the values correctly
+in cents, rounding whenever appropriate.

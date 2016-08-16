@@ -1,0 +1,63 @@
+Race Condition
+==============
+
+
+What it does
+------------
+
+This program starts two threads, synchronizes both threads so that they
+start at the same time and then increments a value. At the end the incremented
+value is printed.
+
+We have two thread incrementing the counter by 50,000, so one would assume that
+100,000 is printed at the end. Though, that might happen from time to time,
+any value between 50,000 and 100,000 may be printed.
+
+
+Debugging
+---------
+
+Debugging in this case will end non-conclusive, because debugging this race
+condition will change its behavior.
+
+
+What is going wrong
+-------------------
+
+The problem in this case is that the variable is accessed from two threads at
+the same time. The simple line `value++` is compiled to 5 JVM instructions:
+
+ 1. Put the value of the variable onto the stack.
+ 2. Put the value `1` onto the stack.
+ 3. Add both values on the stack together.
+ 4. Duplicate the value.
+ 5. Put it into the variable.
+
+The two threads are not limited in any way, so they might overtake each other at
+any step, resulting in the threads either reading or writing the wrong value.
+
+
+The solution
+------------
+
+The solution is a simple reuse of the already existing `SYNCHRONIZATION_OBJECT`:
+
+    for (int counter = 0; counter < 50000; counter++) {
+        synchronized (SYNCHRONIZATION_OBJECT) {
+            value++;
+        }
+    }
+
+We have simply made sure that only one thread at a time can increment the value
+by synchronizing on a simple object.
+
+
+Simplification
+--------------
+
+This program can be simplified in the following steps:
+
+ 1. Remove one thread.
+ 2. Remove the remaining thread, increment the counter in the main thread.
+ 3. Don't increment anything, just set the variable to 100,000.
+ 4. Don't have any variable at all, just print the message.

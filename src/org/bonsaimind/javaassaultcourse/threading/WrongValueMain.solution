@@ -1,0 +1,55 @@
+Wrong Value
+===========
+
+
+What it does
+------------
+
+This program starts a thread (which loops endlessly without doing anything)
+and then waits for user input to terminate the thread by setting a variable to
+false.
+
+However, the program never terminates and the user is repeatedly prompted to
+terminate the thread by pressing return.
+
+
+Debugging
+---------
+
+The first step to debug this program would be to check if the `running`
+variable is actually set, and as we see it is set correctly to false.
+
+The next step would be to stop at the `while` loop inside the thread and
+check there if the `running` variable is correctly set. As we see this is also
+the case. From here it is undefined behavior, the thread my terminate afterwards
+or keeps on running, even though we have seen that the variable is `false`.
+
+
+Why it does not exit
+--------------------
+
+The problem in this case is that variables are thread-locally cached by default.
+Even though we change the variable from the main thread the running thread does
+still hold an old cached version.
+
+
+The solution
+------------
+
+The most simple solution is to define `running` as `volatile`.
+
+    private static volatile boolean running = false;
+
+`volatile` defines that this variable is accessed by different threads and there
+for should never be thread-locally cached.
+
+Another solution would be to appropriately synchronize the threads.
+
+
+Simplification
+--------------
+
+This program can be simplified in the following steps:
+
+ 1. Remove the thread, as it does nothing.
+ 2. Remove everything else, because it wasn't doing anything anyway.

@@ -22,3 +22,10 @@ License
 All source code, unless stated otherwise in the file header, is licensed under
 Creative Commons Zero or as Public Domain.
 
+
+How to use this
+---------------
+
+Simply import the project into Eclipse and use the launchers to launch
+the various examples.
+

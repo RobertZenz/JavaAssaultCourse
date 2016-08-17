@@ -19,6 +19,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Scanner;
 
+/**
+ * This program emulates a simple login system with the user data saved in a SQL
+ * database. You can log in and run a few simple commands.
+ * <p>
+ * However, it has a very glaring security hole, can you guess which? Can you
+ * abuse it without reading the code below first?
+ * <p>
+ * To make it easier for you, the initial login for you is {@code guest} with
+ * the same password.
+ */
 public class StupidMistakeMain {
 	public static void main(String[] args) {
 		try (Database database = new Database()) {

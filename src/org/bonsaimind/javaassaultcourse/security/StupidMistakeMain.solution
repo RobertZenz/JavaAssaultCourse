@@ -1,0 +1,72 @@
+Stupid Mistake
+==============
+
+
+What it does
+------------
+
+This program emulates a very simple system login, after you've logged in with
+the {@code guest} account you can run a few simple commands.
+
+The user database is a real H2 database which runs completely in memory,
+the user data is directly queried from the H2 on every login.
+
+
+Problems
+--------
+
+This system does have the most stupid mistake in the last decade: SQL Injection.
+
+It does use directly insert the user input into the SQL queries and there for
+opens the gateway to allowing the user to run arbitrary code. Let's assume
+the following code line:
+
+    142: String sql = "select ID from USERS where USERNAME = '" + username + "' and PASSWORD = '" + password + "';";
+    143: PreparedStatement statement = connection.prepareStatement(sql);
+    144: ResultSet resultSet = statement.executeQuery();
+
+With `username` and `password` being user input it is easy to abuse this
+constellation. For example if the user enters the following:
+
+    username: root
+    password: ' or 1=1; --
+
+The resulting query will look like this:
+
+    select ID from USERS where USERNAME = 'root' and PASSWORD = '' or 1=1; --';
+
+Which is a valid SQL query and will return the user id of the root user.
+
+
+The solution
+------------
+
+The solution to this is simple: Prepared Statements.
+
+Prepared Statements, no matter the language or framework, allow to use
+placeholders instead of the actual values inside the SQL query. The values
+themselves are than passed to the query in a safe way, like this:
+
+    String sql = "select ID from USERS where USERNAME = ? and PASSWORD = ?;";
+    PreparedStatement statement = connection.prepareStatement(sql);
+    statement.setString(1, username);
+    statement.setString(2, password);
+    ResultSet resultSet = statement.executeQuery();
+
+With such a statement the driver itself will take and use the value, with no way
+to utilize an SQL injection attack no matter what the user input is.
+
+
+Three ways
+----------
+
+There are actually three ways to break this simple login prompt:
+
+ 1. Login as `guest`, run `whois` and enter the following when prompted:
+    `0; update USERS set PASSWORD = 'a' where ID = 1; --`.
+    This will set the root password to `a`.
+ 2. Login as `guest`, run `whois` and enter the following when prompted:
+    `-1 union select PASSWORD from USERS where ID = 1; --`.
+    This will print the password of the root user.
+ 3. At the login prompt, enter `root` as username and `' or 1=1; --` as
+    password.

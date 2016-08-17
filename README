@@ -1,0 +1,24 @@
+Java Assault Course
+===================
+
+
+Purpose
+-------
+
+This repository contains an Eclipse project which provides various examples and
+exercises written in Java. It aims to provide various, easy exercises to allow
+to test your Java and programming knowledge with practical examples and without
+requiring obscure knowledge about the Java Virtual Machine.
+
+Each example/exercise can be executed on its own (there are ready to use
+launchers for each in the `launchers` directory), it also contains a short
+description and documentation. For each example/exercise there is a identical
+named solution file which contains an explanation and the solution.
+
+
+License
+-------
+
+All source code, unless stated otherwise in the file header, is licensed under
+Creative Commons Zero or as Public Domain.
+

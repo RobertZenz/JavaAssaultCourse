@@ -1,0 +1,11 @@
+If you want to contribute, please consider the following:
+
+ 1. The source code is in UTF-8 with UNIX line-breaks.
+ 2. The source code should be well formatted with the attached formatter.
+ 3. There must be a short introduction in the documentation of the class,
+    and a solution file (containing an explanation and the solution).
+    Each example/exercise should be self-contained and executable.
+ 4. Limit the examples/exercises to practical problems, try to stay away from
+    obscure trivia and cornercases. Or at least clearly state so in
+    the description/documentation.
+

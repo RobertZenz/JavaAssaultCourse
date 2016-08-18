@@ -12,8 +12,8 @@
 package org.bonsaimind.javaassaultcourse.memory;
 
 /**
- * This is a simple program which concatenates all numbers up to 100,000 and
- * then prints the length of the resulting string.
+ * This is a simple program which prints the length of all numbers from 0 to
+ * 100,000. It does this by concatenating all numbers into a single `String`.
  * <p>
  * However, it is running extremely slow, can you fix it?
  * <p>

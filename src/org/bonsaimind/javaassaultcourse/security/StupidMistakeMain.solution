@@ -12,8 +12,8 @@ The user database is a real H2 database which runs completely in memory,
 the user data is directly queried from the H2 on every login.
 
 
-Problems
---------
+Problem #1: SQL injection
+-------------------------
 
 This system does have the most stupid mistake in the last decade: SQL Injection.
 
@@ -38,6 +38,24 @@ The resulting query will look like this:
 Which is a valid SQL query and will return the user id of the root user.
 
 
+Problem #2: Clear-text passwords
+--------------------------------
+
+The other very severe security problem is the use of clear-text passwords in the
+database. Passwords shall *never* be saved as clear-text, they always must be
+hashed with a secure and not easy to brute-force algorithm combined with a salt.
+
+There is, for example, the PBKDF2 (Password-Based Key Derivation Function 2)
+which is specifically designed to create password hashes which are hard to brute
+force.
+
+Saving passwords in clear text enables an additional attack vector, in this
+example and in the real world. If an attacker gains read-only access to the user
+database with clear-text passwords, the attacker does now have access to all
+user accounts. If the passwords are hashed, even though the database has been
+compromised, the attacker does still not have access to the accounts themselves.
+
+
 The solution
 ------------
 
@@ -55,6 +73,9 @@ themselves are than passed to the query in a safe way, like this:
 
 With such a statement the driver itself will take and use the value, with no way
 to utilize an SQL injection attack no matter what the user input is.
+
+Additionally the passwords must be hashed before being saved in the database
+using a secure hashing algorithm.
 
 
 Three ways

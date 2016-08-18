@@ -66,4 +66,28 @@ do the same with simply counting the length.
     
     System.out.println(length);
 
-And again it does run a lot faster.
+And again it does run a lot faster. This does still create one string for each
+iteration, but the difference to the original implementation is that no
+additional string with the "full size" of the complete string is created.
+
+As we know the range, another possible way is to use an `if` cascade, like this:
+
+    int length = 0;
+    
+    for (int counter = 0; counter < 100_000; counter++) {
+        if (counter > 9_999) {
+            length = length + 5;
+        } else if (counter > 999) {
+            length = length + 4;
+        } else if (counter > 99) {
+            length = length + 3;
+        } else if (counter > 9) {
+            length = length + 2;
+        } else {
+            length = length + 1;
+        }
+    }
+    
+    System.out.println(length);
+
+And again, this runs a lot faster without allocating strings at all.

@@ -1,0 +1,59 @@
+Press button for random number
+==============================
+
+
+What it does
+------------
+
+This program does simply print a random number every time the Return key is
+pressed.
+
+
+Problem
+-------
+
+The problem this application has is at line #31:
+
+    31: System.out.println(new Random(System.currentTimeMillis()).nextInt(1000));
+
+Especially this part:
+
+    new Random(System.currentTimeMillis())
+
+This will initialize a new `Random` object with the current time in milliseconds
+(Unix time) as seed. However, by keeping the Return key pressed (or pressing it
+fast enough, I challenge you!) the same number is generated. That is because
+the next `Random` object will be initialized with the same seed.
+
+
+Fixing that
+-----------
+
+The easiest fix is to simply declare the `Random` object once and reuse it:
+
+    Scanner scanner = new Scanner(System.in);
+    Random random = new Random();
+    
+    System.out.println("Press Enter to get a new random number.");
+    
+    while (true) {
+        System.out.println(random.nextInt(1000));
+        scanner.nextLine();
+    }
+
+This way it is guaranteed that a new random number will be generated every time.
+
+
+A short talk about seeds
+------------------------
+
+Note that we've omitted setting the seed in the fix. Not setting any seed might
+or might not be viable depending on the use-case and used generator.
+
+For example the constructor of `Random` goes out of its way to make sure that no
+generator with the same seed is created, even when called in rapid succession.
+However, not all generators might do that, they might fall back to using the
+current time in milliseconds or, if really, really broken, might fall back to
+using the current time in seconds or `0` as seed.
+
+Always read the documentation of the generators which you make use of.

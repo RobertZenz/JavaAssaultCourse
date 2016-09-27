@@ -1,0 +1,62 @@
+Do what I meant
+===============
+
+
+What it does
+------------
+
+This program is supposed to print random numbers, however, it does not do that.
+It actually prints the numbers from 0 to 100 in random order. So the description
+is blatantly misleading.
+
+
+Random numbers
+--------------
+
+A random number is, simply put, a number which value can not be predicted. So
+even random numbers might
+
+ * appear in sequences (31, 32, 33)
+ * repeat (31, 31, 31)
+ * seem to miss values (generated 1000 numbers between 0 and 10, but 3 was never
+   encountered)
+
+There is, of course, much more to it.
+
+
+Problems
+--------
+
+Now to the problems with the code, it is a helluva inefficient. It generates one
+hundred random numbers, or at least so it appears. The truth is that it will
+generate an arbitrary number of random values between 100 and infinity.
+
+It generates a number and puts it into a `Set`, then checks if the next
+generated values are already in that `Set`, if yes, a new value is generated
+for that slot. That is very inefficient.
+
+The best way to refactor this would be to output the numbers between 0 and 100
+in a random order. One possible way to do this would be to apply a
+Fisher-Yates-like shuffle:
+
+    Random random = new Random();
+    
+    List<Integer> numbers = new ArrayList<>(100);
+    
+    for (int counter = 0; counter < 100; counter++) {
+        numbers.add(Integer.valueOf(counter));
+    }
+    
+    while (!numbers.isEmpty()) {
+        int randomIndex = random.nextInt(numbers.size());
+        Integer pickedNumber = numbers.remove(randomIndex);
+        
+        System.out.println(pickedNumber.toString());
+    }
+
+
+Documentation
+-------------
+
+Of course the code is not the only thing that needs to be fixed here, the
+documentation and description also must be corrected.
